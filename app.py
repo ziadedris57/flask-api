@@ -12,4 +12,4 @@ def get_recommendations(product_id):
     return jsonify(recommendations)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)
