@@ -1,6 +1,10 @@
 from flask import Flask, jsonify
 
 app = Flask(__name__)
+@app.route('/')
+def home():
+    return "Welcome to the Flask API!"
+
 
 @app.route('/recommendations/<int:product_id>', methods=['GET'])
 def get_recommendations(product_id):
