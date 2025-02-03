@@ -1,8 +1,46 @@
 from flask import Flask, request, jsonify
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+import secrets
+from flask_sqlalchemy import SQLAlchemy
+import os
 
 app = Flask(__name__)
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Configure Flask to use the database
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# Initialize the database
+db = SQLAlchemy(app)
+
+# Define a simple User model
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    status = db.Column(db.String(50), nullable=False)  # Example: "active" or "inactive"
+
+    def __repr__(self):
+        return f"<User {self.email}>"
+
+# Create the database tables
+with app.app_context():
+    db.create_all()
+
+
+
+api_keys = {}
+@app.route('/generate-api-key', methods=['POST'])
+def generate_api_key():
+    # Generate a new API key
+    api_key = secrets.token_hex(16)  # Generate a random hex token
+
+    # Store the API key (In a real application, store it in a database)
+    api_keys[api_key] = {"active": True}  # You can add more metadata if needed
+
+    return jsonify({"api_key": api_key}), 201
 
 @app.route('/')
 def home():
